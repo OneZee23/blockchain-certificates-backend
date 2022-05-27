@@ -1,0 +1,35 @@
+version: '3.7'
+
+services:
+  nest-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      PORT: '3001'
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: '5432'
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 12345
+      POSTGRES_DB: blockchain_certificates_database
+    env_file:
+      - .env
+    ports:
+      - 3001:3001
+    restart: always
+
+  postgres:
+    image: postgres:13.1-alpine
+    environment:
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_DATABASE}
+    ports:
+      - ${DB_PORT}:5432
+    restart: always
+
+  adminer:
+    image: adminer:latest
+    restart: always
+    ports:
+      - 8080:8080

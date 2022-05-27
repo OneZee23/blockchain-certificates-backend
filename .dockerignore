@@ -1,0 +1,8 @@
+# Ignore everything
+**
+
+# Allow only valuable files
+!dist
+!node_modules
+!package.json
+!Dockerfile
