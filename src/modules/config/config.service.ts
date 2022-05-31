@@ -2,18 +2,64 @@ import { Injectable } from '@nestjs/common';
 import { plainToClass } from 'class-transformer';
 import { validateSync } from 'class-validator';
 import { ConfigModel, JwtOptionsModel } from "./config.model";
+import { ethers } from 'ethers';
+import * as ipfsHttpClient from 'ipfs-http-client';
+import Web3 from 'web3';
 require('dotenv/config');
 
 @Injectable()
 export class ConfigService {
   private readonly _config: ConfigModel;
+  private readonly _web3Polygon: ethers.providers.JsonRpcProvider;
+  private readonly _ipfsClient: ipfsHttpClient.IPFSHTTPClient;
+
+  private readonly _web3Configuration = {
+    timeout: 30000, // ms
+
+    clientConfig: {
+      // Useful if requests are large
+      maxReceivedFrameSize: 100000000, // bytes - default: 1MiB
+      maxReceivedMessageSize: 100000000, // bytes - default: 8MiB
+
+      // Useful to keep a connection alive
+      keepalive: true,
+      keepaliveInterval: -1, // ms
+    },
+
+    // Enable auto reconnection
+    reconnect: {
+      auto: true,
+      delay: 1000, // ms
+      maxAttempts: 10,
+      onTimeout: false,
+    },
+  };
 
   constructor() {
     this._config = ConfigService.validateConfig();
+
+    // web3 blockchain
+    const polygonProvider = new Web3.providers.HttpProvider(this.config.polygonNet.address, this._web3Configuration);
+    this._web3Polygon = new ethers.providers.Web3Provider(polygonProvider as unknown as ethers.providers.JsonRpcFetchFunc);
+
+    // ipfs
+    this._ipfsClient = ipfsHttpClient.create({
+      host: this._config.ipfs.host,
+      port: this._config.ipfs.port,
+      protocol: this._config.ipfs.protocol,
+    });
   }
 
   get config(): ConfigModel {
     return this._config;
+  }
+
+  get web3Polygon() {
+    return this._web3Polygon;
+  }
+
+  get ipfsClient() {
+    return this._ipfsClient;
   }
 
   public get typeorm(): any {
@@ -54,6 +100,16 @@ export class ConfigService {
         accessExp: process.env.JWT_ACCESS_EXP,
         secretRefresh: process.env.JWT_SECRET_REFRESH,
         refreshExp: process.env.JWT_REFRESH_EXP,
+      },
+      polygonNet: {
+        address: process.env.POLYGON_NETWORK_ADDRESS,
+        polygonscanAPIKey: process.env.POLYGON_NETWORK_SCAN_API_KEY,
+        netCode: process.env.POLYGON_NETWORK_CODE,
+      },
+      ipfs: {
+        host: process.env.IPFS_HOST,
+        port: process.env.IPFS_PORT,
+        protocol: process.env.IPFS_PROTOCOL,
       },
     };
     const result = plainToClass(ConfigModel, plainConfig);

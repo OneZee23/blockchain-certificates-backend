@@ -1,6 +1,13 @@
 import { Type } from 'class-transformer';
 import { IsEnum, IsInt, IsString, ValidateNested } from "class-validator";
-import { CertificatesSettings, JWTSettings, TypeormSettings, Web3Settings } from "./setting-models";
+import {
+  CertificatesSettings,
+  IPFSSettings,
+  JWTSettings,
+  PolygonSettings,
+  TypeormSettings,
+  Web3Settings
+} from "./setting-models";
 
 export enum AppEnv {
   Development = 'DEV',
@@ -39,4 +46,12 @@ export class ConfigModel {
   @ValidateNested()
   @Type(() => JWTSettings)
   readonly jwt!: JWTSettings;
+
+  @ValidateNested()
+  @Type(() => PolygonSettings)
+  readonly polygonNet!: PolygonSettings;
+
+  @ValidateNested()
+  @Type(() => IPFSSettings)
+  readonly ipfs!: IPFSSettings;
 }

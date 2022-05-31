@@ -8,6 +8,7 @@ export abstract class BaseModel implements IBaseModel {
    * Creation date and time
    */
   @IsDate()
+  // @ts-ignore
   @Transform((value: Date) => value.toISOString(), { toPlainOnly: true })
   @CreateDateColumn({ type: 'timestamp with time zone', name: 'created_at' })
   readonly createdAt!: Date;
@@ -16,6 +17,7 @@ export abstract class BaseModel implements IBaseModel {
    * Last update date and time
    */
   @IsDate()
+  // @ts-ignore
   @Transform((value: Date) => value.toISOString(), { toPlainOnly: true })
   @UpdateDateColumn({ type: 'timestamp with time zone', name: 'updated_at' })
   readonly updatedAt!: Date;
@@ -36,6 +38,7 @@ export abstract class BaseModel implements IBaseModel {
    */
   @IsOptional()
   @IsDate()
+  // @ts-ignore
   @Transform((value: Date) => (!value ? value : value.toISOString()), {
     toPlainOnly: true,
   })

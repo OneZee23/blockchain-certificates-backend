@@ -21,11 +21,12 @@ export class AuthGuard implements CanActivate {
     if (prefix !== 'Bearer') {
       throw new Error('User not auth');
     }
-    try {
-      await this.jwtService.verify(accessToken, { secret: this.configService.config.jwt.secretAccess });
-    } catch (TokenExpiredError) {
-      throw new Error('Unauthorized exception');
-    }
+    // TODO: For production need to remove comments
+    // try {
+    //   await this.jwtService.verify(accessToken, { secret: this.configService.config.jwt.secretAccess });
+    // } catch (TokenExpiredError) {
+    //   throw new Error('Unauthorized exception');
+    // }
 
     if (process.env.ENV === AppEnv.Testing.toString()) {
       if (accessToken) {
@@ -47,5 +48,7 @@ export class AuthGuard implements CanActivate {
     }
 
     return true;
+    console.log(this.jwtService);
+    console.log(this.configService);
   }
 }
